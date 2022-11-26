@@ -132,40 +132,105 @@ namespace HelloWorld
             //}
 
 
-            Console.WriteLine("Array and List Excercises");
+            //Console.WriteLine("Array and List Excercises");
 
-            //Array Reverse
+            ////Array Reverse
             
 
-            var numbers = new List<int>();
+            //var numbers = new List<int>();
 
 
-            while ( numbers.Count() < 5)
-            {
-                Console.WriteLine("Please input a number:");
-                var input = Console.ReadLine();
+            //while ( numbers.Count() < 5)
+            //{
+            //    Console.WriteLine("Please input a number:");
+            //    var input = Console.ReadLine();
 
                 
 
-                if (numbers.Contains(Int32.Parse(input)))
-                {
-                    Console.WriteLine("Error:  Plese Try again.");
-                }
-                else
-                {
-                    numbers.Add(Int32.Parse(input)); 
-                }
-            }
+            //    if (numbers.Contains(Int32.Parse(input)))
+            //    {
+            //        Console.WriteLine("Error:  Plese Try again.");
+            //    }
+            //    else
+            //    {
+            //        numbers.Add(Int32.Parse(input)); 
+            //    }
+            //}
 
-             numbers.Sort();
+            // numbers.Sort();
 
-            foreach (var number in numbers)
+            //foreach (var number in numbers)
+            //{
+            //    Console.WriteLine(number);
+            //}
+
+            //Console.ReadLine();
+
+
+
+
+            //STRINGS MANUPULATIONS
+            var fullname = "Chukwuebuka Emmanuel Vitus ";
+            //always remember to trim inputs so as to remove the whitespaces about them.
+            Console.WriteLine(fullname.Trim().ToUpper());
+
+            //to split strings, use the 'split' method for simpler computation but use the 'IndexOf' method for complex ones
+
+            var index = fullname.IndexOf(' ');      //we supplied empty character/space as we want from the fist occurence of spaces to split the strings,  we can supply a char if we wish
+            //now we get the firstname 
+            var fname = fullname.Substring(0, index);   //zero is the starting index(ie the beginning of the string) [the next argument is to what extent do we want the string(which to the next space or empty string)]
+            var mname = fullname.Substring(index + 1);
+            Console.WriteLine("FirstName: {0}", fname);
+            Console.WriteLine("LastName: {0}", mname);
+
+            //THE SPLIT METHOD
+            var names = fullname.Split(' '); //the result of this is an array.  now we can access it as an elements
+            Console.WriteLine("Firstname: {0}", names[0]);
+            Console.WriteLine("Lastname: {0}", names[1]);
+
+            //REPLACE METHOD
+            var replaceFirName = fullname.Replace("ebu", "eme");
+            Console.WriteLine("Fullname: {0}", replaceFirName);     //always remember to Trim inuts  
+
+
+            //WORDS SUMMARISER
+            var sentence = "This is going to be a very vaery very very very very very very very very long text";
+
+            //we should never use magic numbers but instead constants
+            //we get a const for the maximum number of words
+            const int maxSentenceNumber = 20;
+
+            //algorithm
+            if (sentence.Length < maxSentenceNumber)
             {
-                Console.WriteLine(number);
+                Console.WriteLine(sentence);
             }
+            else
+            {
+                //first we slpit the words.  the split method returns an array (in this case, a string array)
+                var words = sentence.Split(' ');
 
-            Console.ReadLine();
+                //the following is used to hold the selected summarised words
+                var summaryWords = new List<string>();
 
+                //the follwoing var is used to hold the total characters/spaces counted during loop
+                var totalCharacters = 0;
+
+                foreach (var word in words)
+                {
+                    summaryWords.Add(word);
+
+                    totalCharacters += word.Length + 1;
+
+                    if (totalCharacters > maxSentenceNumber)
+                    {
+                        break;
+                    }
+                }
+
+                var summary = String.Join(" ", summaryWords) + " .....";
+                Console.WriteLine(summary);
+            }
         }
 
 
