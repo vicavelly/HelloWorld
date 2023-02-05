@@ -672,8 +672,479 @@ namespace HelloWorld
 
             >>  Console.WriteLine(builder);
             >>  Console.WriteLine("First Char : " + builder[0]         //we can use indexer to access individual characters in a string
-                       .
+                       
+        */
 
+
+
+
+
+        /*
+            WORKING WITH FILES
+            ------------------
+            ------------------
+
+        In the namespace named System.IO is where you'll find the classes that work with files and directories.  The classes that work with files include
+            
+            File, FileInfo
+            Directory, DirectoryInfo
+            Path
+            
+            File, FileInfo,
+                The file and FileInfo classes provides methods for creating, copying, deleting, moving, and opening of files.  The differences between File and FileInfo are
+                    i.  FileInfo --  Provides Instance methods
+                    ii. File     --  provides static methods
+
+                If you're going to perform small operations e.g. (get file attributes) then it's a good practice to use static methods.
+                The problem with static methods is that every time its used, some security checking is done by the OS to make sure the current user has access to
+                the file.  You see, if you have a large number of operations this affects the performance of your operations.  In this case it's more efficient to 
+                create a FileInfo Class and access all its instance methods. This way, security check is done only once during creation of a fileInfo object.
+
+                Some useful methods in this classes
+                Create()        --    To create a file
+                Copy()          --    
+                Delete()
+                Exists()        --    To check if a file exists.
+                GetAttributes() --    This returns the attributes of the given file
+                Move()          --    Move the file around
+                ReadAllText()   --    
+
+
+
+            Directory, DirectotyInfo
+                Very similar to the the above classes
+                    i.  Directory       --  provides static methods
+                    ii. DirectoryInfo   --  provides instance methods
+
+                Some useful methods in these classes
+                CreateDirectory()
+                Delete()
+                Exists()
+                GetCurrentDirectory()   --  This returns where the application is currently sitting
+                GetFiles()              --  This returns the files in your directory (you can specify the type(extension) of file needed
+                Move()
+                GetLogicalDrives()
+            
+            
+            Path
+                The path class provides methods to work with a string that contains a file or directory path information
+
+                Some useful methods in this class
+                GetDirectoryName()
+                GetFileName()
+                GetExtension()
+                GetTempPath()
+
+
+
+        WORKING WITH FILES DEMO
+
+            >>  File.Copy(@"c:\temp\myFile.jpg", @"c:\temp\myFile.jpg", true); 'true' is used to overwrite if the file already exist.
+            >>  var path =  @"c:\someFile\pic.jpg";
+            >>  File.Delete(path);
+            >>  if(File..Exists(path))
+                  {
+                    ...
+                  }
+            >>  File.ReadAllText(path)                      if you want to read all the text in a file  (this method returns a string.)
+
+
+            >>  var fileInfo = new FileInfo(path);
+            >>  fileInfo.CopyTo(source, destination);
+            >>  fileInfo.Delete(path);
+            >>  if(fileInfo.Exists)
+                {
+                    ....    
+                }
+
+        WORKING WITH DIRECTORY AND DIRECTORYINFO CLASS
+            
+            >>  var path = @"c:\temp\folder1";
+            >>  Directory.CreateDirectory(path);
+            The next static method 'getFiles' returns a string array and optionally you can paas at least one out of three 3 arguments.
+            The first arfgument is the path, followed by search pattern (you can use this to recover specific files in the directory).
+            then the third is SearchOptions.  For now, we use 'SearchOptions.AllDirectories'  this performs the required query in the current directory and its sub-directories
+
+            >>  var directories = Directory.GetFiles(path,"*.*", SearchOptions.AllDirectories); the "*.*" specifies to return all files.  You can use "*.sln" to return
+            all files with .sln extension.    This returns a IEnumerable
+
+            //use foreach loop to loop throught the returned directories
+            foreach(var directory in directories)
+            {
+                Console.Writeline(directory);
+            }
+
+            if you want to check if a directory exist use the Exists() static mathod
+            >>  Directory.Exists(path)
+
+
+            //Now for directoryInfo
+            >>  var directoryInfo = new DirectoryInfo(path);
+            >>  directoryInfo.GetFiles();                       //get all files in this directory
+            >>  directoryInfo.GetDirectories();                 //gets all directories in this directory  
+
+
+        WORKING WITH THE 'PATH' CLASS
+            This class provides a number of methods that makes it easy to work with a string that represents a path and extract different parts of that class
+            eg.
+            
+            >>  var path = @"C:\Projects\CSharpFundamentals\HelloWorld.sln";
+
+            a poor way of getting the extension out of the path string above would be;
+                i search for where the dot sign begins
+            >>  var dotIndex = path.indexOf('.');
+            >>  var extension = path.SubString(dotIndex);
+            >>  Console.WriteLine(extension);
+
+
+            But we dont want to do the above, instead we want to use the PATH class
+
+            //so the get the extension from the path string we use
+
+            //note: this is a static method
+            >>  var pathExthesion = Path.GetExtension(path);
+            >>  Console.WriteLine(pathExtension);
+
+            //To extract the filename
+            >>  var getFileName = Path.GetFileName(path);
+            >>  Console.WriteLine(getFileName);
+
+            //To get file name without extension
+            >>  var getFileNameNoExtension = Path.GetFileNameWithoutExtension(path);
+            >>  Console.WriteLine(getFileNameNoExtension);
+
+            //To get directory name
+            >>  var getDirectoryName = Path.GetDirectoryName(path);
+            >>  Console.WriteLine(getDirectoryName);
+            */
+
+
+        /*
+            DEBUGGING APPLICATIONS
+            ----------------------
+            ----------------------
+
+        BREAKPOINTS
+            Use Breakpoints when debugging
+            >> f9
+            Use f5 to run the program immediately in debug mode(it instantly runs the code till the first breakpoint.)
+
+            After running the program(while using breakpoints) to 'step-over' or 'run' the next line of code, use f10
+            
+            Please note when we use f10, we stepOver that line of code Example: if we are on the line code that states >> GetSmallest(numbers, 3);
+            and we use f10, we stepover this line of code onto the next line of code.  in order to step into that line of code and see the work going
+            on there we use (F11) to stepinto the line of code.
+            
+            We can drag the yellow arrow to go 'BACK' the line of code we might want to execute. 
+
+            To stepOUT of a method use (SHIFT + F11)
+
+            To stop debugging, use (SHIFT + F5)
+
+            To run the program to the next breakpoint, press F5
+
+            We can delete Breaakpoints manually or we go the the toolbar and select 
+            >> Debug > Windows > Breakp[oints      we can disable them or delete (X)  them.
+
+        WATCH WINDOW
+            In the ToolBar Go To 
+            >> Debug > Windows > Watch > Watch 1
+
+            A window opens up with which we can put the variable which are of interest to us and watch the values it holds at the runtime/debug mode.  That way,
+            we wont need to hover our mouse all the time over a variable to find out what's holding at a particular runtime.
+
+        Locals and Autos Windows
+            When using the watch windows, it may get a bit tedious to type the name of the variables you might be interested in.  This is where the locals window and
+            autos windows comes in.
+            The Autos window is just like a watch window but will automatically display list of variables based on where you are (method) in the code.  The downside 
+            is that these variable might be much. then we can use the locals window, it will show vaiabls in the current context.
+            To use these windows, in the toolbar, go to 
+            >> debug > windows > Autos                  OR
+            >> debug > windows > Locals
+
+        CALL STACK
+            At times when running in debug mode, one might get lost as to how he got to the current debug position as a program may contain many functions.
+            In the toolbar GoTo 
+            >> Debug > windows > call stack
+            a window is opened that shows the order of method that were called from the moment that the application ran up to where you are now.
+
+            The top of the list will be your current location while the bottom will be the starting point
+        */
+
+
+        /*
+            INDEXERS
+            --------
+            --------
+
+            This is a way to access elements in a class that represents a list of values.   
+                eg.  array[0] =1;
+                     list[0]=1;                         using an indexer, we can access elements in the list/array
+
+            
+            Please note, we are not trying to reinvent the wheel of collection/list/array.  
+            The need for indexers in a class is because of this;
+            A class may be written to retrieve and hold data. For Instance a user details in a cookie file which may hold SOOO MUCH DETAILS.  
+            We need indexer in that class to be able to retrieve and set the value using KEY <-> VALUE pairs.   Dictionary - HashTable
+
+            
+            WHEN TO USE DICTIONARY AND LIST
+            if you need a list and would like to retrieve them using a key/value in the list cupList["serial240"] = 240; use a dictionary, but if you need to retrieve using 
+            its index in the collection eg cupList[1] = 2;  use list or array
+
+            To Declare an indexer
+            please note:   An indexer is nothing but a property
+
+            >>  public class User
+                {
+                    public string this [string key]
+                    {
+                        get{...}
+                        set{...}
+                    }
+                 }
+
+
+
+            >>  public class User
+                {
+                    //now we need a field to store the 'key' <-> 'value' pairs (the data structure we use is a dictionary)
+                    private Dictionary<int, string> _dictionary;
+
+                    public User()
+                    {
+                        _dictionary = new Dictionary<int, string>();
+                    }
+
+                    //the indexer           (Resharper shotcut - type 'indexer' + 'Tab' to create an indexer of the class you are in)
+
+                    public string this[int index]
+                    {
+                        get{ return _dictionary[index]; }
+                        set{ _dictionary[index] = value; }
+                    }
+                    
+                }
+
+
+            Now back in the main program,
+            We create an instance of the indexed class User
+
+            >>  static void Main(string[] args)
+                {
+                    var user = new User();
+                    User[23467]= "Vitus C.E.";
+
+                    console.Writeline(User[23467]);
+                }
+            
+        */
+
+
+        /*
+            Class Coupling
+            --------------
+            --------------
+
+
+            There are two types of relationships between classes
+                1. Inheritance
+                2. Composition
+
+            INHERITANCE :  A kind of relationship between two classes that allow one to inherit code from another
+                                                Eg.  A 'CAR' is a 'VEHICLE'                             'Is-A' Relationship
+
+            COMPOSITION :  a kind of relationship that allows one to contain the other
+                                                Eg.  A CAR has an Engine
+        */
+
+
+        /*
+        
+            ACCESS MODIFIERS
+            ----------------
+            ----------------
+
+            PUBLIC          -   Accessible from anywhere
+            PRIVATE         -   Accessible only from the class
+            PROTECTED       -   Accessible only from the class and its derived classes.
+            INTERNAL        -   Accessible only from the same assembly
+            PROTECTED INTERNAL - Accessible only from the same assembly or any derived classes
+        */
+
+        /*
+            CONSTRUCTORS AND INHERITANCE
+            ----------------------------
+            ----------------------------
+
+            Lets say we have a class (vehicle) with a private field.  this field is initialised in the vehicle class constructor
+            >>  public class Vehicle
+                {
+                    private string _regristrationNumber;
+                    public Vehicle (string registrationNumber){
+                        _registrationNumber = registrationNumber
+                    }
+                }
+
+            Let's also say we have another class (car) that inherits from the vehicle class.  This class wont be able to access the _registrationNumber
+            field.      For us to have access we may need to change the access modifier to 'Protected'  which mosh advises changes the idea of encapsulation as 
+            this field that is supposed not to be accessible is now accessible in another class.
+
+            Another way to have access is to use the base keyword
+
+            >>  public class Car : Vehicle
+                {
+                    public Car (string registrationNumber) : base (registrationNumber)
+                    {
+                        
+                    }
+                }
+
+            when we use the base keyword, its simply a method call to the base class and the method called when we use the base keyword is the constructor
+            So we called the base constructor and passed a string to it   base(registrationNumber).         So basically when the Car class is called a string is 
+            passed to it which in turn passes the string to the Vehicle class for use.
+
+            Please Note:  The working/code in the base class is implemented first before the derived classs
+
+        */
+
+
+        /*
+            DOWNCASTING AND UPCASTING
+            -------------------------
+            -------------------------
+            This has to do with inheritance
+            let's say we have the following classes in place
+            public class Shape
+            {
+                
+            }       and
+
+            public class Circle : Shape
+            {
+
+            }
+
+            Converting from a derived class to a base class is known as UPCASTING
+            SAMPLE:
+            Circle circle = new Circle();
+            Shape shape = circle; 
+
+            Converting from a base class to a derived class is known as DOWNCASTING
+            SAMPLE:
+            Shape shape = new Shape();
+            Circle circle = shape;         OR   Circle circle = (Circle)shape;
+
+            Imagine we have an object and would like to cast it to another object
+            >>  Car car = new Car();
+                Shape obj = new Shape();
+
+                we can try casting the shape object to car
+                Car car = obj as Car    if the casting is not possible it returns a null so
+                if(car != null)
+                {
+                    ...
+                }
+
+                We also have the 'is' keyword.  With the is keyword we can check if an object can be casted to a type
+                eg.
+                if (obj is Car)
+                {
+                    //then we cast it
+                    Car car = (Car) obj;
+                    ...s
+                }
+
+
+            WHY WE NEED TO DOWNCAST OBJECTS
+                Lets say we have the following code
+
+            >>  Private void Button_Click(Object sender, RoutedEventsArgs e)
+                {
+                    ...
+                }
+
+            Now at the first parameter of the above function is of type 'Object' called sender   and this is the 'source' or initiator
+            of the Button_Click events.
+
+            the problem is, if you type
+            >>  sender.             You wont see any intellisense or properties or methods related to the Button Class.  You'll only
+                                    see members of the object class.
+
+            This is a common case where we would need to downcast an object.   so we can do the fwllg.
+
+            >>  var button = (Button) sender;
+
+            When you now type [  button.  ]  you'll see that you have access to the members of the button class.
+
+
+
+
+            NOW FOR A BIGGER PROBLEM 
+            We cast to the Button Class because we know we are in function that handles the click event of a button.
+            What if we don't know?
+
+            Here is a solution.
+
+            This is were we use the 'as' keyword
+
+            >>  var button = sender as Button;                      Next we check if it is null.
+            >>  if(button != null)
+                {
+                    ...
+                }
+
+        */
+
+        /*
+            BOXING AND UNBOXING
+            All types in c# are divided into two categories.          1. Value Type       2. Reference Type
+
+            VALUE TYPES
+            -----------
+            Value types are stored on the 'stack'  stack is the limited amount of memory allocated to your each thread of your program.
+            This space is used to strore simple values like;
+            1.  All primitive types : byte, int, float, char, bool as well as the 'struct' type.
+            
+            values stored in the stack has a short life span.  As soon as the program goes out of the scope '{}' they get 
+            kicked out of the memory.
+            
+            REFERENCE TYPES
+            ---------------
+            Reference types are stored in the heap (This is a larger amount odf memory).   We use heap to store objects that requires
+            a longer life-time. 
+            Examples of reference types in c# is basically any classes (Object, Array, String, CustomClass, etc)
+            
+            Note: 'Object' class is the parent of all classes in c#.  That is all classes inherits the Object class.
+            
+            Earlier we learnt that we can convert an object reference (class/instance) to its base class, which is any class it inherits from
+            Eg.
+            >>  Circle circle = new Circle();
+                Shape shape = circle;           //This custom 'circle' class inherits from the shape class, that's why the conversion
+                                                    is possible
+                                                    
+            Since the object class is the base class for all classes in .net we can modify the code
+            
+            >>  object shape = circle;
+            
+        
+            BOXING
+            ------
+            This is the process of converting a value type instance to an object reference.  In other words, its the conversion of 
+            'value types' meant for the 'stack' to reference type (heap)
+            Eg.     int num = 10;
+                    object objNum = num;            or    object num = 10;
+                    so the values are stored in the heap instead of the stack
+                    
+            UNBOXING
+            --------
+            This is the opposite of boxing
+            Eg.   object obj = 10;
+                  int number = (int)obj;               OR          var number = (int)obj; 
+
+
+            LESSON:  bE AWARE THAT when youre calling method and that method gets an argument of type 'object' be aware that if you pass
+                    a value type there, boxing is going to happen.  Boxing has a performance penalty
         */
     }
 }

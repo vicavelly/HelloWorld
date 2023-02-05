@@ -186,7 +186,8 @@ namespace HelloWorld
             //THE SPLIT METHOD
             var names = fullname.Split(' '); //the result of this is an array.  now we can access it as an elements
             Console.WriteLine("Firstname: {0}", names[0]);
-            Console.WriteLine("Lastname: {0}", names[1]);
+            Console.WriteLine("Middlename: {0}", names[1]);
+            Console.WriteLine("Lastname: {0}", names[2]);
 
             //REPLACE METHOD
             var replaceFirName = fullname.Replace("ebu", "eme");
@@ -194,7 +195,7 @@ namespace HelloWorld
 
 
             //WORDS SUMMARISER
-            var sentence = "This is going to be a very vaery very very very very very very very very long text";
+            var sentence = "This is going to be a very very very very very very very very very very long text";
 
             //we should never use magic numbers but instead constants
             //we get a const for the maximum number of words
