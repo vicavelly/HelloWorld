@@ -1144,7 +1144,198 @@ namespace HelloWorld
 
 
             LESSON:  bE AWARE THAT when youre calling method and that method gets an argument of type 'object' be aware that if you pass
-                    a value type there, boxing is going to happen.  Boxing has a performance penalty
+                    a value type there, boxing is going to happen.  Boxing has a performance penalty 
+        */
+
+        /*
+            GENERICS
+            --------
+
+            With generics we create a class once and use it multiple times, you see, the traditional way of instantiating a class, for
+            instance if a class is used for storing value types,(int, double etc) every time you instantiate, it would have to be boxed
+            and this have performance penalty.
+
+            >>  public class GenericList<T>                     ('T' stands for template)
+                {
+                    public void Add (T value)
+                    {
+
+                    }
+
+                    //To Objectify we add an index
+                    public T this [int index]
+                    {
+                        get { throw new NotImplementedException(); }
+                    }
+                }
+
+            In the main program
+            >>  var numbers = new GenericList<int>();
+
+            NOTE: when we try to access the Add Method, you'll notice in the intellisense That the required input is now 'int'
+            >>  numbers.Add();
+
+            We can also use the 'genericList' to store a list of books
+            >>  var books = new GenericList<Book>();
+            NOTE: when we try to access the Add Method, you'll notice in the intellisense That the required input is now 'Book'
+            >>  books.Add(new Book());
+
+
+            So now we have code reuseablility and we dont have that performance penalty 
+            Why?  At runtime, our 'genericList' is actually a list of books not a list of objects. so there's no casting or boxing.
+
+            The above codes are the basics of creating a Generic List.  Practically, We would be using generics list instead of creating one.
+            To see all generics see in the intellisense when you type
+            System.Collections.Generic.
+
+
+            Stay tuned if you want to create a Generic (i didnt say generic list) for the application you are working on.
+            
+        
+            You see when we created the genericList class we added a '<T>'     public class GenericList<T>
+            you see the '<T>' there is a parameter and we could have multiple parameters '<T, T, T>'  for eg. a use case for that will
+            be a dictionary.  (A dictionay is a data structure that uses a hashtable to store and retrieve objects) With dictyionary
+            we need to specify a 'key' and 'value'  and they can be of any type.
+            
+            Lets create a dictionary here
+            >>  public class GenericDictionary<TKey, TValue>    (Always prefix your parameters with 'T' and give it a meaningful name.)
+                {
+                    public void Add(TKey, TValue)
+                    {
+                    }
+                }         
+
+            Now we can create a dictionary with letsay 'string' for the key and the 'Book' class for value
+            >>  var dictionary = new GenericDictionary<string, Book>();
+
+                dictionary.Add("1234", new Book() );
+
+            Another thing we need to know about generics is 'constraints'
+            
+            Take a look at the generic class and method declaration You'll see that the 'template' <T> is used to allow whatevere form
+            of datatype we want to specify.    
+            Sometimes we may want to limit what is being sent.
+
+            Lets say we want to have a method that return the highest number out of two inputs
+
+            NOrmally we would write
+            >>  public int Max (int a, int b)
+                {
+                    return a > b ? a : b;
+                }
+                but genetically,
+            >>  public T Max<T> (T FirstValue, T SecondValue)
+                {
+                    return FirstValue > SecondValue ? FirstValue : SecondValue;
+                    
+                    // if you write the above return statement just like that you'll get an error because the compiler at this point
+                        see 'FirstValue' and 'SecondValue' as an object.  we may need to apply constraints to specify what the variables are.
+                                            
+                }
+
+            So we write it this way
+            Since we are trying to compare the variables it also means they implement the 'IComparable' Interface, so we set a constraint
+            using the IComparable Interface and with this we can compare the two objects.
+            The IComparable has a method called 'CompareTo()' and with this we can compare the two objects.
+
+            To apply a constraints, we go to the end of the parentheses and add (just like we do with inheritance - just with some  few
+            modifications.
+
+            >>  public T Max<T> (T FirstValue, T SecondValue) where T : IComparable            ( Where 'T'  is <->':'    IComparable
+                {
+                    //return FirstValue > SecondValue ? FirstValue : SecondValue;
+
+                    return FirstValue.CompareTo(SecondValue) > 0 ? FirstValue : SecondValue;
+                                         
+                }   //Please note that this generic method was created in a non genric class.
+                    //WE dont always need to start with a generic class,  likewise we can also move the constraints to the class level
+
+            >>  public class Utilities<T> where T : IComparable
+                {
+                    public T Max (T FirstValue, T SecondValue)             ( Where 'T'  is <->':'    IComparable
+                    {
+                        return FirstValue.CompareTo(SecondValue) > 0 ? FirstValue : SecondValue;                
+                    }
+                }
+
+            There are other types of constraints 
+                //  Where T : IComparable               (Here we apply constraints to an interface)
+                //  where T : Product                   (Here Product represents a class)
+                //  where T : int                       (Here int represents value-type)
+                //  where T : new()                     (here new() represents an object that has a default constructor)
+
+            We've seen a constraints with an interface, now let take a look at a constraints with a class
+
+            >>  public class Product
+                {
+                    public string Title {get;set;}
+                    public float Price { get; set; }
+                }
+
+            >>  public class DiscountCalculator<TProd> where TProd : Product
+                {
+                    public float CalculateDiscount(TProd product)
+                    {
+                        return product.Price;
+                    }
+                }
+            
+            Now let's see a constraint for a value type
+
+            in c# value types cannot be null (an 'int' for eg. should have values of 0,1,2.... we can use this class to give our 
+                                              value types the ability to be nullable [NOTE: THIS CLASS ALREADY EXIST IN C#] )
+            >>  public class Nullable<T> where T : struct
+                {
+                    private object _value;
+                    //we create a default constructor
+                    public Nullable()
+                    {
+                    }
+
+                    //use this constructor to get a value and store it as an object (This is because we want it to be nullable)
+                    public Nullable(T value)
+                    {
+                        _value = value;
+                    }
+
+
+                    //we create another property to check if _value has a value or is null
+                    public bool HasValue { get { return _value != null } }
+
+                    public T GetValueOrDefault()
+                    {
+                        if(HasValue)
+                        {
+                            // return _value;  (ERROR: This is because the varialbe is still an object we need to unbox it by upcasting
+                            return (T)_value;
+                        }
+                        else
+                        {
+                            // if it doesnt have a value we return the default of the datatype (int will be zero(0) )
+                            return default(T);
+                        }
+                    }
+                }
+
+                In the main program we can check
+
+                >>  var number =    new Nullable<int>(5);
+                    Console.WriteLine("Has Value :" + number.HasValue);
+                    Console.WriteLine("Value :" + number.GetValueOrDefault);
+
+                >>  var number =    new Nullable<int>();
+                    Console.WriteLine("Has Value :" + number.HasValue);
+                    Console.WriteLine("Value :" + number.GetValueOrDefault);
+
+                We may need to instantiate an instance of 'T' in in the method/class thats when we use the 'new()' constranit
+
+                >>  public class Utilities<T> where T : IComparable, new()
+                    {
+                        public void DoSomething(T value)
+                        {
+                            var obj = new T();
+                        }
+                    }
         */
     }
 }
