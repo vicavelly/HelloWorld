@@ -1337,5 +1337,193 @@ namespace HelloWorld
                         }
                     }
         */
+
+
+        /*
+        
+            DELEGATES
+            ---------
+            A delegate is an object/reference that knows how to call a method or a group of method.
+            In other words, a delegate is a reference or pointer to a method.
+
+            we can call method directly so why do we need a delegate
+            
+            WHY?
+            ---
+            This techniques enables us to create applications that are extensible and flexible
+
+            So lets say we have the following codes in the classes [Photo, PhotoProcessor, PhotoFilter]
+                >>  public class Photo
+                    {
+                        public static Photo Load(string path)
+                        {
+                            return new Photo();
+                        }
+
+                        public void Save()
+                        {
+
+                        }
+                    }
+
+                >>  public class PhotoFIlter
+                    {
+                        public void ApplyBrightness(Photo photo)
+                        {
+                            Console.WriteLine("Applied Brightness!"):
+                        }
+                        
+                        public void ApplyContrast(Photo photo)
+                        {
+                            Console.WriteLine("Applied Contrast!"):
+                        }
+                        
+                        public void Resize(Photo photo)
+                        {
+                            Console.WriteLine("Resized Image"):
+                        }
+                    }
+
+
+                >>  public class PhotoProcessor
+                    {
+                        public void Process(string path)
+                        {
+                            var photo = Photo.Load(path);
+
+                            var filter = new PhotoFilter();
+
+                            filter.ApplyBrightness(photo);
+                            filter.ApplyContrast(photo);
+                            filter.Resize(photo);
+
+                            photo.Save();
+                        }
+                    }
+
+
+            Lets say we have a group of people that wants to use the PhotoProcessor Framework.  The only Problem with this code/framework
+            is that the code is not extensible.
+
+            Why?  Here we already have 3 predefined 'filters', What if a developer(for instance) wants to use the framework and apply
+                  a new filter. You(the developer) will need to add this undefined filter [The problem is, you'll have to do this 
+                  each time, adding a filter, recompiling and deploying]  
+            With delegates, we can make the framework extensible such that a developer can create their own filter without relying
+            on you(the developer)
+            
+            To add a delegate, 1st we need to add/define a delegate type.  When defining delegate we need to define the 'signature' of 
+            the type of method the delegate would be calling.
+
+                >>  public delegate void PhotoFilterHandler(Photo photo);
+
+            [void PhotoFilterHandler(Photo photo)] this is the signature.  Any method that is void and take Photo as an argument.
+
+            Now in order to make the framework extensible, instead of hardcoding the filters, we're going to pass a delegate to the 
+            method and remove the hardcoded 'filter'
+
+
+                >>  public class PhotoProcessor
+                    {
+                        public delegate void PhotoFilterHandler(Photo photo);
+
+                        public void Process(string path, PhotoFilterHandler filter)
+                        {
+                            var photo = Photo.Load(path);
+
+                            //we call it here passing a photo object to it (what it means is that this code does not know what filter
+                            // will be applied and it is the responsibility of the client(main program) of this code to define the 
+                            // filters they want.
+                            filterHandler(photo);
+
+                            photo.Save();
+                        }
+                    }
+
+            Now in the main program, we instantiate the PhotoProcessor 
+                >>  static void Main(string[] args)
+                    {
+                        var processor = new PhotoProcessor();
+
+                        //we create an instance of the filters class from which we would choose 'filters'
+                        var filters = new PhotoFilters();
+
+                        //Now lets create an instance of that delegate called 'PhotoFilterHandler' in PhotoProcessor class
+                        //Here also, we set/point the delegate to an action/'filter' of our choice
+                        
+                        PhotoProcessor.PhotoFilterHandler filterHandler = filters.ApplyBrightness;
+                        
+
+                        //we can easily add another filter this way;
+                        filterHandler += filters.ApplyContrast;
+                        filterHandler += filters.RemoveRedEyeFilter;
+        
+                        //In our process method of PhotoProcessor, we pass the filter
+                        processor.Process("photo.png", filterHandler);  
+                    }
+                    //Now we can also create filters not predefdined in the filters class
+                    static void RemoveRedEyeFilter(Photo filter)
+                    {
+                        //this method confors withe signature of delegate
+                        Console.WriteLine("Removed RedEye"):
+                    }
+
+
+
+
+        PLEASE NOTE :     THIS IS THE RECOMENDED AND BEST WAY WHEN WE CHOOSE TO USE DELEGATES
+
+        Instead of creating a custom delegate, we can use one or two of the existing delegates that comes with the DotNet Framework
+        In DotNet There are two delegates that are generic and they are 
+            1.  Action<>            can take up to 16 parameters and can point to any method that takes any of
+                                    these parameters and has void as their return type IE. a method that does not return a value.
+            2.  Func<>              used as delegate for method that have expected datatype/class returns
+
+        They are in System.Action    OR System.Func    They both come in two forms one ordinary and another generic form
+
+        DIFFERENCE
+        Func -  Points to a method that returns a value             Func<T1,TResult>  TResult - represents the return type
+        Action - Points to a method that returns 'void'             Action<T> T represents the Parammeters accepted
+
+        So we change this in our photo processing framework. and instead use generic action delegates
+
+        So in the PhotoProcessor Class
+            >>  public class PhotoProcessor
+                {
+                    public void Process(string path, Action<Photo> filterHandler )
+                    {
+                        var photo = Photo.Load(path);
+
+                        filterHandler(photo);
+                        
+                        photo.Save();
+                    }
+                }
+
+        In the Main Method
+
+            >>  static void Main(string[] args)
+                {
+                    var processor = new PhotoProcessor();
+                    
+                    var filters = new PhotoFilters();
+                    
+                    Action<Photo>  filterHandler = filters.ApplyBrightness;
+                       
+                    filterHandler += filters.ApplyContrast;
+                    filterHandler += filters.RemoveRedEyeFilter;
+        
+                    processor.Process("photo.png", filterHandler);          
+                }
+                static void RemoveRedEyeFilter(Photo filter)
+                {
+                     //this method confors withe signature of delegate
+                     Console.WriteLine("Removed RedEye"):
+                }
+
+        NOTE:  Use delegates when we have an event design pattern.
+        
+        */
+
+
     }
 }
