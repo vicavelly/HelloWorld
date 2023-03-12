@@ -1223,7 +1223,7 @@ namespace HelloWorld
                 {
                     return a > b ? a : b;
                 }
-                but genetically,
+                but generically,
             >>  public T Max<T> (T FirstValue, T SecondValue)
                 {
                     return FirstValue > SecondValue ? FirstValue : SecondValue;
@@ -1300,7 +1300,10 @@ namespace HelloWorld
 
 
                     //we create another property to check if _value has a value or is null
-                    public bool HasValue { get { return _value != null } }
+                    public bool HasValue 
+                    { 
+                        get { return _value != null } 
+                    }
 
                     public T GetValueOrDefault()
                     {
@@ -1455,7 +1458,7 @@ namespace HelloWorld
 
                         //we can easily add another filter this way;
                         filterHandler += filters.ApplyContrast;
-                        filterHandler += filters.RemoveRedEyeFilter;
+                        filterHandler += RemoveRedEyeFilter;
         
                         //In our process method of PhotoProcessor, we pass the filter
                         processor.Process("photo.png", filterHandler);  
@@ -1510,7 +1513,7 @@ namespace HelloWorld
                     Action<Photo>  filterHandler = filters.ApplyBrightness;
                        
                     filterHandler += filters.ApplyContrast;
-                    filterHandler += filters.RemoveRedEyeFilter;
+                    filterHandler += RemoveRedEyeFilter;
         
                     processor.Process("photo.png", filterHandler);          
                 }
@@ -1524,6 +1527,404 @@ namespace HelloWorld
         
         */
 
+
+
+        //LAMBDA EXPRESSIONS
+        /*
+        A lambda expression is an anonymous method.  Ie. A method that has no ACCESS MODIFIER, no NAME, no RETRUN STATEMENT.
+        We use them for convienience.
+        SYNTAX
+        args(arguments)  =>  expressions
+
+        lets say we want to method that takes a number and returns the square of that number.
+
+            >>  static int Square(int number)
+                {
+                    return number * number;
+                }
+            in the Main method
+            >>  static void Main(string[] args)
+                {
+                    Console.WriteLine(Square(5));
+                }
+
+        To put the Square code in the form of lambda expression
+            >>  static void Main(string[] args)
+                {
+                    //using the syntax
+                    // args => expression
+                    
+                    number => number * number;
+                }
+
+        The entire square method is now shorter. we didnt have to specify access modifier the complier does that for us
+
+        we need to assign that lambda expression to a delegate (remember that a delegate is a pointer to a method or a group of method)
+
+            >>  static void Main(string[] args)
+                {
+                    Func<int, int> square = number => number * number;
+
+                    COnsole.WriteLine( square(5) );
+                }
+
+        NOTE: If you have more than one argument, place them in a bracket
+                Eg. (number, secNumber) => number * number;
+
+        NOTE: If you dont have any argument, place a bracket
+                Eg. () => number * number;
+
+        NOTE:  The lambda expression has access to any variable declared in the lambda argument space and also variables declared 
+                in the space/scope in which the lambda was declared in
+                Eg    {
+                        var num = 10;  //the lambda expression can use this variable because its declared in the scope in which the lambda was declared
+                        Func<int, int> square = number => number * number;
+                      }
+
+        ANOTHER EXAMPLE
+        We want to create a method that takes a number and multiples it by another number(constant)
+        
+            >>  const int factor = 5;
+                Func<int, int> multiplier = n => n * factor;
+
+                var result = multiplier(10);
+
+                Console.WriteLine( result );
+
+        ANOTHER EXAMPLE
+        Here we have a class called BookRepository and this is responsible for returning a list of books from the database
+
+            >>  public class BookRepository
+                {
+                    public List<Book> GetBooks()
+                    {
+                        return new List<Books> 
+                        {
+                            new Book() { Title = "Title 1", Price = 5 },
+                            new Book() { Title = "Title 2", Price = 8 },
+                            new Book() { Title = "Title 3", Price = 17 }
+                        };
+                    }
+                }
+                 
+                Lets say we want to write a code that returns all the books that are cheaper than 10 dollars
+
+                First we write the code without lambda expression and then we will refactor the code with lambda expression
+
+            First, In the main method, lets get the list of books
+            >>  static void Main(string[] args)
+                {
+                    var books =     new BookRepository().GetBooks();
+                    
+                    books.FindAll()
+                }
+            When we type 'books. ' in the intellisense we go to the Find methods that are used for filtering and collections, we select FindAll()
+            if you look at the argument's intellisense, you'll find that here we need a 'predicate' of type book (a predicate is basically
+            a delegate which points to a method that gets a 'book' [for this instance] and returns a boolean value specifying if a given
+            condition was satisfied.
+
+            For Example             We are going to create a predicate function and call it 'itsCheaperThan10Dollars'
+
+            >>  static bool isCheaperThan10Dollars(Book book)
+                {
+                    //return true if book.Price is less that 10 dollars
+                    return book.Price < 10;
+                }
+                The above is what we call a predicate method.  It gets an object of type 'Book' and returns 'true' if a given condition is 
+                satisfied.
+                
+                Now Back to the main method
+                static void Main(string[] args)
+                {
+                    var books =     new BookRepository().GetBooks();
+                    
+                    //we add it here
+                    var cheapBooks = books.FindAll(isCheaperThan10Dollars)
+
+                    //To the the selected books
+                    foreach(var book in cheapBooks)
+                    {
+                        Console.WriteLine(book.Title);
+                    }
+                }
+                in the FIndAll() method, it will iterate the colection(books) and for each book, it will pass that book to the 
+                'isCheaperThan10Dollars' method to determine if the condition is satisfied.  If Yes, then it will return that book in
+                the list of result.
+
+
+            NOW TO REFACTOR THE CODE USING LAMBDA EXPRESSION
+                
+                All we need to do is 
+                >>  var cheapBooks = books.FindAll(book => book.Price < 10);
+                and that's all.                         Then we remove the method named 'isCheaperThan10Dollars'   The lamda expression
+                above does the same work as the predicate below
+
+                
+                static bool isCheaperThan10Dollars(Book book)
+                {
+                    //return true if book.Price is less that 10 dollars
+                    return book.Price < 10;
+                }                
+        */
+
+
+
+        /*
+        EVENTS AND DELEGATES
+        --------------------
+
+        Events is a mechanism for communication between objects.  That means when somethin happens inside an object, it can notify other 
+        objects about that. 
+
+        WHY WE NEED EVENTS?
+        To help us build loosely-coupled application
+        Helps extending applications
+
+        Example
+        We have a VideoEncoder Class with one method called 'encode' which encodes a video posted to it.
+
+            >>  public class VideoEncoder
+                {
+                    public void Encode(Video video)
+                    {
+                        //Encoding Logic...
+                        .....
+                        _mailService.Send(new Mail() );     Here when the encoding is done, we send a mail to the owner of the video
+                    }
+                }
+                let's say in the future we may want to send a text message to the video owner.  What we'll need to do is add the extre piece
+                of code that does that  - sample
+                public class VideoEncoder
+                {
+                    public void Encode(Video video)
+                    {
+                        //Encoding Logic...
+                        .....
+                        _mailService.Send(new Mail() );
+                        _messageService.Send( new Text() );
+                    }
+                }
+                The problem here is, because we add this extra piece of code here, Thae encode method changed.  Which means it has to be
+                recompiled, includes the Video Encoded.    This ultimately means that any other class that is dependent of the VideoEncoder
+                class will have to be recompile and redeployed.  We need to create applications such that when a change is made, the change 
+                has little/no effect on the whole application.
+
+                To solve this problem, we can use EVENTS
+
+                The following is what the code will look like after implementing EVENTS
+                public class VideoEncoder
+                {
+                    public void Encode(Video video)
+                    {
+                        //Encoding Logic...
+                        .....
+                        OnVideoEncoded();  //the purpose of this method will be to simply notify the subscribers.
+                                           //Here this Encode method knows nothing about the mailService or messageService.
+                                           //we can add more subscriber in their various classes without making any changes here
+                    }
+                }
+
+                HOW DOES THE VIDEOENCODER NOTIFY THE SUBSCRIBERS?
+                For a publisher class (in this case the VIDEOENCODER) to notify its subscribers, it need to send a message to them (in c#
+                practical terms, it means invoking a method in the sunscriber.)
+                HOW DOES THE VIDEOENCODER KNOWS WHAT METHOD TO CALL?
+                For that to happen, there need to be an agreement/contract between the publisher and subscriber.  This is something they 
+                agree upon and this is A METHOD WITH A SPECIFIC SIGNATURE
+                below is a typical implementation of a method in a subscirber
+                >>  public void OnVideoEncoded(object source, EventArgs e)
+                    {
+                    }
+                    
+               The above method is often called eventHandlers and that is the method that is called by the publisher when the EVENT is raised
+               
+        
+               HOW DO WE TELL VIDEOENCODED WHAT METHOD TO CALL?
+               This is when a delegate comes in 
+                    - Here, a delegate is the agreement between the publisher and subscriber
+                    - The delegate here determines the signature of the eventHandler method in the subscriber.
+
+
+                The following is a complete program implementing - DELEGATES AND EVENTS
+
+                First we have the 'video' class
+                >>  public class Video
+                    {
+                        public string Title { get; set; }  //a basic class with a simple property for the title of a video
+                    }
+
+                We also have the vidoe 'encoder' class
+                this class has one 'Encode' method that gets the 'video' the encode method displays a message as an alternate to encoding video
+                >>  public class VideoEncoder
+                    {
+                        public void Encode(Video video)
+                        {
+                            Console.WriteLine("Encoding Video.......");
+                            Thread.Sleep(3000);
+                        }
+                    } 
+
+                Now in the 'Main' program
+                static void Main (string[] args)
+                {
+                    //we instantiate and create Video
+                    var video = new Video() { Title = "video 1" };
+
+                    //Then we instantiate the VideoEncoder
+                    var videoEncoder = new VideoEncoder;
+
+                    //finally, we call the encode method while passing the video object
+                    videoEncoder.Encode(video);
+                }
+
+                To give the Encode method the ability to publish an event There are three steps we need to follow
+                    1. We need to define a delegate
+                    2. We need to define an EVENT based on that delegate
+                    3. Raise or publis the event
+
+
+                >>  public class VideoEncoder
+                    {
+                      1 //Defining a delegate
+                        //By convention in c#, when declaring a delegate for an event, the name would be suffixed with the term 'EventHandler'
+
+                        public delegate void VideoEncodedEventHandler(object source, EventArgs args);
+
+                      2 //Define an event based on that delegate
+
+                        pubic event VideoEncodedEventHandler VideoEncoded;
+                        public void Encode(Video video)
+                        {
+                            Console.WriteLine("Encoding Video.......");
+                            Thread.Sleep(3000);
+
+                            OnVideoEncoded();
+                        }
+                    }
+                    
+                      3 //To Raise an event
+                        //To raise an event, we need a method that's responsible for it
+                        //By convention in dotnet, the event publisher method be 'protected', 'virtual', and 'void'
+                        //So we just need to call this method in the encode method after all processing to the Encode method is done 
+                        //look at the encode method just above
+
+                     protected virtual void OnVideoEncoded()
+                     {
+                        //we'll start with checking if there's any subscribers
+                        if(VideoEncoded != null)
+                        {
+                            //now we call the event
+                            //when we type VideoEncoded(  the intellisense show the parameters needed and they are that which was declared
+                            //in the event handler. (object source, EventsArgs args)
+                            //as for the parameter 'source' this depends on the source of the event/ OR who's publishing the events
+                            //for this 'source', it is the current class OR the current object so we type 'this'
+
+                            //The 'args' is used to send additional data.  Whenever we don't want to send any data for this parameter
+                            // we use EventArgs.Empty
+
+                            VideoEncoded(this, EventArgs.Empty);
+                        }
+                     }
+                                
+                     The OnVideoEncoded method will notify all subscribers
+                                            THAT'S ALL FOR NOW
+
+                    Now to create a couple of subscribers, we go to the main method and create some classes.
+                    >>  public class MailService
+                        {
+                            //now to make this class a subscriber
+                            public void OnVideoEncoded(object source, Events)
+                            {
+                                Console.WriteLine("Sending Email....................");
+                            }
+                        }
+                        //Now we need to subscribe the MailService, we do that in the main method
+
+
+                    >>  static void Main (string[] args)
+                        {
+                            var video = new Video() { Title = "video 1" };
+
+                            var videoEncoder = new VideoEncoder;//publisher
+                            var mailService = new MailService();//subscriber
+
+                            videoEncoder.videoEncoded += mailService.OnVideoEncoded;    //now subscribed
+                                                                                        //Note 'OnVideoEncoded' was pointed to, not a method
+                                                                                        //call.  No 'OnVideoEncoded()'                                                                                                                                                                                                                                                                                                                                    
+
+
+                            videoEncoder.Encode(video);
+                        }
+                    
+                    Now we want to send a reference of the video, so that the subscriber knows what video was encoded.
+                    To do that we use a custom class instead of 'EventsArgs'.       That custom class should derive from EventArgs and include
+                    any additional data that you'ld like to send to subscribers.
+
+                    So in the publisher class 'VideoEncoder' we create the custom class and ensure it derives from EventsArgs
+                    
+                    >>  public class VideoEventsArgs : EventsArgs
+                        {
+                            public Video video { get; set; }
+                        }
+
+                    So now in our delegate, instead of putting 'EventsArgs', We type VideoEventArgs
+
+                    >>  public delegate void VideoEncodedEventsHandler(object source, VideoEventsArgs);
+
+                    Also in the publisher virtual method 'OnVideoEncoded' we change
+
+                    First we go back to the encode method (this is because we need details of the video that was encoded) and pass the 
+                    video object to the 'protected vitual' method ( OnVideoEncoded() )
+
+                    >>  public void Encode(Video video)
+                        {
+                            Console.WriteLine("Encoding Video.......");
+                            Thread.Sleep(3000);
+
+                            OnVideoEncoded(video);
+                        }
+
+                    Then in the method we add a parameter to receive the video object
+                    >>   protected virtual void OnVideoEncoded(Video video)
+                         {
+                            if(VideoEncoded != null)
+                            {
+                                VideoEncoded(this, new VideoEventsArgs(){ Video = video });
+                            }
+                         }
+
+                     NOTE:      in all subscribers change the parameter of EventsArgs to VideoEventsArgs   Example
+                                                            public class MailService
+                                                            {
+                                                                public void OnVideoEncoded(object source, VideoEventsArgs e)
+                                                                {
+                                                                    Console.WriteLine("Sending Email.................... Title: " + e.Video.Title );
+                                                                }
+                                                            }
+          
+        
+                    This next step is to show us how to acheive the same things above with less code
+                    
+        
+                    Basically, dotnet came up with the idea that "We dont have to create a delegate each time we want to create an event"
+                    so they came up with a delegate type called 'EventHandler' and it comes in two forms - a normal form and a generic form
+                    
+                    1 - EventHandler
+                    2 - EventHandler<TEventsArgs>       //TEventsArgs represents the EventsArgs Or CustomEventsArgs parameter passed in the delegate
+
+
+                    So
+
+                    >>  public event EventHandler<VideoEventsArgs> VideoEncoded;
+
+                    is the same as the codes below
+                    
+                    >>  public delegate void VideoEncodedEventHandler(object source, EventArgs args);
+                    >>  pubic event VideoEncodedEventHandler VideoEncoded;    
+                    
+                    So if you want to use the new eventHnadler without sending any data/EventArgs use the normal form (ie the one without generic)
+                    
+                    >>  public event EventHandler VideoEncoded;                                                                                                                                                 
+        */
 
     }
 }
