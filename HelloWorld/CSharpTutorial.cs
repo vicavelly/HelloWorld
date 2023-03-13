@@ -1926,5 +1926,71 @@ namespace HelloWorld
                     >>  public event EventHandler VideoEncoded;                                                                                                                                                 
         */
 
+
+        /*
+        EXTENSION METHODS
+        -----------------
+        -----------------
+        Extension method provides us the ability to add methods to an existing class without changing its source codes or creating a new type
+        that inherit from it
+
+        Here is an example
+        let's say we have a string variable callled 'post' supposedly contains an insane amnount of text eg blog text
+
+            >>  string post = "This is supposed to be an insane amount of text Blah! Blah! Blah!...";
+
+        Let say we want to shorten the words 'post' for user display we can't create a custom class that derives from 'String' class.
+
+        in situations like this, we can use extension methods to add new methods to an existing class.
+
+        so lets say we want to create a string method called 'shorten' to help shorten the words according to how many words we want it to.
+
+            >>  var shortnedPost = post.Shorten(4);
+
+        to create an extension method, we need to create a static class (as per convention)
+        Also a goo naming convention for this extension would be to start with the class we're extending 'string' and then add "Extensions"
+
+            >>  public static class StringExtensions
+                {
+                    //write extension methods here
+                }
+
+        now we can create the shorten method 
+        As per convention, when creating a extension method, the first argument should always be 'this' followed by the type you're extending
+        'String' and then give it a name as below
+        
+             >>  public static class StringExtensions
+                {
+                    public static string Shorten(this String str)
+                    {
+                    }
+                }
+
+        Also we want this method to take a parameter of type 'int' called 'numberOfWords'
+
+            >>  public static class StringExtensions
+                {
+                    public static string Shorten(this String str, int numberOfWord)
+                    {
+                        if(numberOfWords == 0)
+                            return "";
+
+                        var words = str.Split(' ');
+
+                        if(words.Length <= numberOfWords)
+                            return str;
+
+                        //the vaariable 'words'at the point in the code is a string array and string array does not have a method called 'take'
+                        //the 'take' method here is an extension method by microsoft that can be used in any class that implements IEnumerable
+                        //interface and in this case, the string array
+
+                        return string.Join(" ", words.Take(numberOfWords));
+
+                    }
+                }
+
+        Now back to our main program. And then we run it.
+        */
+
     }
 }
