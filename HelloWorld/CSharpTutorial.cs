@@ -1992,5 +1992,157 @@ namespace HelloWorld
         Now back to our main program. And then we run it.
         */
 
+        /*
+        
+        LINQ
+        ----
+        ----
+
+        Language Integrated Query gives the capability to query object.
+                To Query objects in memory          -----       LINQ to objects
+                to query Databases                  -----       LINQ to entities
+                to query XML                        -----       LINQ to XML
+                to query ADO.NET DataSets           -----       LINQ to Data Sets
+
+        For this sample we have a simple 'Book' Class
+                >>  public classs Book
+                    {
+                        public string Title { get; set; }
+                        public float Price { get; set; }
+                    }
+
+        And also we have a 'Book Repository' class which has a method called GetBooks that simulates getting an IEnumerable of Books
+                >>  public class BookRepository
+                    {
+                        public IEnumerable<Book> GetBooks()
+                        {
+                            return new List<Book>
+                            {
+                                new Book() {Title = "ADO.Net step by step", Price = 5}, 
+                                new Book() {Title = "ASP.NET MVC", Price = 9.99f}, 
+                                new Book() {Title = "ASP.NET WEB API", Price = 12}, 
+                                new Book() {Title = "C# ADVANCED TOPICS", Price = 7}, 
+                                new Book() {Title = "C# ADVANCED TOPICS", Price = 9}, 
+                            };
+                        }
+                    }
+
+        Now for the 'Main' method.  We instantiate the 'BookRepository' and get the list of Books
+                >>  public void Main (string[] args)
+                    {
+                        var books = new BookRepository().GetBooks();
+                    }
+
+        Lets say we want a list of books that are cheaper than $10.  The following is what the code will look like if we didnt use LINQ
+                >>  public void Main (string[] args)
+                    {
+                        var books = new BookRepository().GetBooks();
+
+                        //first we create a new list
+                        var cheapBooks = new List<Book>();
+
+                        //then we iterate the books collection and add the selected books to the new list
+                        foreach(var book in books)
+                        {
+                            if (book.Price < 10)
+                            {
+                                cheapBooks.Add(book);
+                            }
+                        }
+
+                        //since we now have the list of cheap books we can display each one
+                        foreach(var cheapbook in cheapbooks)
+                        {
+                            Console.WriteLine(cheapbook.Title + " " + cheapbook.Price);
+                        }
+                    }
+
+        The following is what the code will look like if we use LINQ
+                >>  public void Main (string[] args)
+                    {
+                        var books = new BookRepository().GetBooks();
+
+                        //using LINQ
+                        //we use 'Where' to filter collections
+                        var cheapbooks = books.Where(b => b.Price < 10);
+
+                        //since we now have the list of cheap books we can display each one
+                        foreach(var cheapbook in cheapbooks)
+                        {
+                            Console.WriteLine(cheapbook.Title + " " + cheapbook.Price);
+                        }
+                    } 
+
+        LINQ also has a method called 'OrderBy' and this is used for sorting collections.  We can say;
+                >>  books.OrderBy(b => b.Title);
+
+        LINQ also has one powerful method called 'Select' and this is used for projections/transformations.  lets say we want to iterate 
+        the list of books and foreach books we have to convert it to another object OR maybe we want to just want to select one of its
+        properties and display as a string.
+                >>  books.Select(b => b.Title);
+
+        One thing about LINQ is that you can chain these commands
+                >>  book.Where(b => b.Price < 10).OrderBy(b => b.Title).Select(b => b.Title);
+
+        You see, the code just above started as an IEnumerable of 'Book' and because of the 'Select' (which returns strings) statement 
+        ended up as IEnumerable of string.  You see, the select statement has TRANSFORMED the object state of books to another state of strings
+        and because of that, following statement becomes void.  as the book/cheapbook state has now been transformed to strings 
+                >>  foreach(var cheapbook in cheapbooks)
+                        {
+                            Console.WriteLine(cheapbook.Title + " " + cheapbook.Price); --- void
+
+                            //instead simply display
+                            Console.WriteLine(cheapbook);
+                        }
+
+
+        So this syntax of writing LINQ is called LINQ extension methods
+                >>  book
+                        .Where(b => b.Price < 10)
+                        .OrderBy(b => b.Title)
+                        .Select(b => b.Title);
+
+        Another syntax to writing LINQ codes is called LINQ query operators
+        So we're writing the same codes using query operators
+                >>  var cheapbooks = 
+                        from b in books
+                        where b.Price < 10
+                        orderby b.Title
+                        select b.Title;
+                        //select b;             use this to select 'book' object
+                        
+        LINQ query operators always start with 'from' and always finish with the 'select' statement 
+
+        if we want to return/search for only one result, we use the 'SingleOrDefault' instead of the 'Where' extension method
+                >>  var bookSearch = books.SingleOrDefault(b => b.Title == "ASP.NET MVC");
+
+        Also there is another extension method called 'First' used to get the first object in a collection.
+        For instance i want the first instance of a book titled 'C# ADVANCED TOPICS' in the book collection
+                >>  var bookSearch = books.First( b => b.Title == "C# ADVANCED TOPICS" );
+
+        Just like the 'Single' extension method,  this method 'First' returns the first occurence or it gives an error.  If you want the 
+        statement to return 'null' if it does'nt find a first occurence use 'FirstOrDefault'. 
+                >>  var bookSearch = books.FirstOrDefault( b => b.Title == "C# ADVANCED TOPICS" );
+
+        Also, just like we have a 'FirstOrDefault' we also have a 'LastOrDefault' which returns the last occurence of a given statement
+                >>  var bookSearch = books.LastOrDefault( b => b.Title == "C# ADVANCED TOPICS" );
+
+        Anothe LINQ extension method are 'Skip()' and 'Take()'.
+        The 'Skip(2)'  skips(for instance) the first 2 two records on the collection, while the 'Take(3)' method takes or continues execution
+        from the 3rd third object in the collection and these returns an IEnumerable
+                >>  var pagedBooks = books.Skip(2).Take(3);
+                    foreach (var pagedBook in pagedBooks)
+                    {
+                        Console.WriteLine(pagedBook.Title);
+                    }
+
+        There's is also an extension method called Max used to return the maximum number of a given statement
+                >>  var priceCount = books.Max(b => b.Price);
+                    Console.WriteLine(priceCount);
+                    //likewise we can use the 'Min' method to check which is the cheapest book we have on the collection
+                    //Also there's the 'Sum' method which can be used to get the Summation of prices
+                    //Also there's the 'Average' method which can be used to get the average of prices
+
+        */
     }
 }
