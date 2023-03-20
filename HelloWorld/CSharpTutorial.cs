@@ -2144,5 +2144,71 @@ namespace HelloWorld
                     //Also there's the 'Average' method which can be used to get the average of prices
 
         */
+
+
+
+        /*
+        
+        NULLALE TYPES
+        -------------
+        -------------
+
+        In c# a value type cannot be null.  eg. a bool can either be true of false.  There are situations that may need us to cater for 
+        null values Eg. if we're working on a database, and we have column/field called birthDate with a DateTime Signature.  DateTime though
+        value type should be nullable as not everyone may want to disclose their birhtDate.  I
+        In this case we many want to use a Nullable Type
+        if we code this 
+                >>  DateTime birthDate = null;
+
+        We immediately get a syntax error because value type cannot be nulable. We can solve that issue by using the Nullable generic
+                >>  Nullable<DateTime> birthDate = null;
+
+        Also instead of writing the Nullable out we can use the short form by
+                >>  DateTime? birthDate = null;                 //This is same as using the Nullable generic
+
+        The members/properties of a nullable type
+                >>  birthDate.Equals()
+                >>  birthDate.GetValueOrDefault()
+                >>  birthDate.Value
+                >>  birthDate.ToString()
+                >>  birthDate.HasValue
+
+        If we call 'birthDate.Value' when it is null we get an exception. So use 'GetValueOrDefault' or you can check using 'birthDate.hasValue'
+
+        NOTE: also if we have two DateTime object and one is nullable, we cannot put/set the one that is not nullable to the one that's nullable
+                >>  DateTime? date = new DateTime(2014, 1, 1);
+                    DateTime date2 = date                           //Error here
+                    //but if we must do this, then we just access the 'GetValueOrDefault' method
+                >>  DateTime? date = new DateTime(2014, 1, 1);
+                    DateTime date2 = date.GetValueOrDefault();
+
+        NULL COALESCING OPERATOR
+            lets say we have the following codes
+                >>  DateTime? date = null;
+                    DateTime date2;
+                    
+                    if(date != null)
+                    {
+                        date2 = date.GetValueOrDefault();
+                    } 
+                    else
+                    {
+                        date2 = DateTime.Today;
+                    }
+
+                    Console.WriteLine(date2);
+
+
+            Now instead of writing all these, we can just write
+                >>  DateTime? date = null;
+                    DateTime date2 = date ?? DateTime.Today
+
+            The Coalescing OPerator '??' helps us shorten it and it reads (set date2 equals to date if there's value or set date2 equals
+                                                                            to 'DateTime.Today' of date is null).
+
+            this operator for dateTime is a little bit similar to the tertiary operator.   if we were to use the tertiary operator, this is
+            how it would look like
+                >>  DateTime date3 = (date != null) ? date.GetValueOrDefault() : DateTime.Today;
+        */
     }
 }
