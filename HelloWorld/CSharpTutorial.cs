@@ -2210,5 +2210,233 @@ namespace HelloWorld
             how it would look like
                 >>  DateTime date3 = (date != null) ? date.GetValueOrDefault() : DateTime.Today;
         */
+
+        /*
+            EXEPTION HANDLING
+            -----------------
+
+        In c#, an exception is a Class in the System Namespace.     To handle exceptions, we use 'try', 'catch' blocks.  
+        To 'throw' error means to send the error to the caller of the code
+
+                >>  try
+                    {
+                    }
+                    catch
+                    {
+                        throw
+                    }
+
+        When handling exceptions we can have multiple catch blocks and they have to be from 'most specific to most generic'
+        what we mean by MOST SPECIFIC TO MOST GENERIC
+        Lets say we have a calculator class, and we call that class in the main method.
+
+                >>  try
+                    {
+                        var calculator = new Calculator();
+                        var result = calculator.Divide(5,0);
+                    }
+                    catch(Exception ex)
+                    {
+                        Console.WriteLine(ex);
+                    }
+
+                The error/exception in the code above is the DivideByZeroException and when we type this 'DivideByZeroException' and select it
+                and the press f12, you open the object browser and are able to see the Parents Class of the 'DivideByZeroException' they are
+                    DivideByZeroException : System.ArithemeticException : System.SystemException : System.Exception
+
+                So here we have 4 levels of heiarchy and the 'Exception' Class is base of all of them.  'DivideByZeroException' is the most
+                specific while the 'Exception' is the most generic. So lets say we want our program to handle all levels of Exception
+                handle each levels differently we can use multiple 'catch' expressions.
+
+                So we start with the most specific, 'DivideByZeroException'
+
+                >>  try
+                    {
+                        var calculator = new Calculator();
+                        var result = calculator.Divide(5,0);
+                    }
+                    catch(DivideByZeroException ex)
+                    {
+                        Console.WriteLine(ex);
+                    }
+                    catch(ArithemeticException ex)
+                    {
+                        Console.WriteLine(ex);
+                    }
+                    catch(Exception ex)
+                    {
+                        Console.WriteLine(ex);
+                    }
+
+                We use the most specific ones because the most generic ones, in this case 'Exception' can hold a pointet to any of its children
+                Which means if we specify for instance as first
+                    catch(Exception ex)
+                    {
+                        Console.WriteLine(ex);
+                    }
+                    any exception that happens here, the 'Exception catch would be the first to get it so we would have a chance to handle 
+                    specific exception like the 'DivideByZeroException'.  Even when you do this, c# would complain/give error about the order
+                    of the catch block as 'Exception' is the base class.
+                    
+        In the 'try & catch' we also have the 'finally' block 
+                >>  try
+                    {
+                        var calculator = new Calculator();
+                        var result = calculator.Divide(5,0);
+                    }
+                    catch(Exception ex)
+                    {
+                        Console.WriteLine(ex);
+                    }
+                    finally
+                    {
+                    }
+
+                WHY WE USE FINALLY BLOCK
+                in DOTNet we have classes that access unmanaged resources (unmanaged resources are resources that are not managed by clr so
+                                                                           there's no garbage collection attached to them.  Eg. File Handles,
+                                                                           Database Collection, Network Collections, Graphic handles. and in
+                                                                           situations with these we need to manually do clean up.)
+                                                                           
+                Any class that uses unmanaged resources, is expected to implement a class called 'IDisposable' (Idisposable is an interface
+                and has a method called Dispose which is where we manually do/implement the cleanup)  
+                So we can use the finally block to call the dispose method of the class that uses the unmanaged resources.
+                
+                For Instance (a new instance)
+                >>  static void Main(string[] args)
+                    {
+                        //we call a streamReader    //a class for reading files
+                        var streamReader = new StreamReader(@"c:\file.zip");
+
+                        //so we use a try block to try and read the content
+
+                        try
+                        {
+                            var content = streamReader.ReadToEnd();
+                        }
+                        catch (Exception ex)
+                        {
+                            
+                        }
+                        finally 
+                        {
+                            streamReader.Dispose();
+                        }
+                        Basically what we done here is said that if the code runs or meets an exception we want to make sure that the stream
+                        is closed.  This is important because if we dont do it we end up keeping files open, database connection unclosed.
+
+                        So make sure than when were using unmanaged resources (files, databases, network connection, Graphic handles) make sure
+                        to 'dispose()' them.
+
+                        NOTE:  The 'finally' block will always be executed.
+                    } 
+
+                //Whenevere you get the 'possible System.NullReferenceException' intellisense use if statement to check if the statement is null
+                In the following sample we try to read a file 
+
+                    static void Main(string[] args)
+                    {
+                        StreamReader streamreader = null;           //this is placed here because we want to use 'streamreader' in another scope '{}'
+                        try
+                        {
+                            streamReader = new StreamReader(@"c:\file.zip");
+                            var content = streamReader.ReadToEnd();
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Sorry! An Unexpected error occured");
+                        }
+                        finally
+                        {
+                            if(streamReader != null)
+                                streamReader.Dispose();
+                        }
+                    }
+
+                There's a cleaner way to write this code.  Instead of declaring a variable outside the try block then initializing inside the
+                try block and finally checking if it's not null and then disposing it.  We can use the 'using' statement
+
+                    static void Main(string[] args)
+                    {
+                        try
+                        {
+                            using (var streamReader = new StreamReader(@"c:\file.zip"))
+                            {
+                                var content = streamReader.ReadToEnd();   
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Sorry! An Unexpected error occured");
+                        }
+                    }
+                    So basically, when we use the usiing statement, internally, the compiler will create a 'finally' block under the hood
+                    which will call the dispose() method of the StreamReader.  So we dont have to manually call it.
+
+                HOW TO CREATE CUSTOM EXCEPTIONS
+                Lets say we have a class called YouTubeApi which takes in a user name and is responsible for getting a list of videos to the user
+                    public class YouTubeApi
+                    {
+                        public List<video> GetVideos (string user)
+                        {
+                            try
+                            {
+                                //Access Youtube Web Service                NETWORK STREAM
+                                //Read the Data
+                                //Create a list of video objects
+                            }
+                            catch (Exception ex)
+                            {
+                                throw;
+                            }
+
+                            return new List<video>();
+                        }
+
+                something can go wrong when fetching videos.  We may want to create our own exception to handle it differently.
+                so we create a custom youtube exception.  and we called it 'YoutubeException' and it derives from the Exception class.
+                
+                    public class YouTubeException : Exception
+                    {
+                        //we create a constructor
+                        //also with this constructor, we call the base constructor of the Exception class and pass the message and inner Excp.
+                        public YouTubeException(string message, Exception innerException)
+                            :base(message, innerException)
+                        {
+                            
+                        }
+                    } 
+                    
+                so lets try it again and throw a YouTubeException
+                public List<video> GetVideos (string user)
+                        {
+                            try
+                            {
+                                //Access Youtube Web Service                NETWORK STREAM
+                                //Read the Data
+                                //Create a list of video objects
+                            }
+                            catch (Exception ex)
+                            {
+                                throw new YouTubeException("Could not fetch videos", ex);
+                            }
+
+                            return new List<video>();
+                        }
+
+                Now in the main method, we can 
+                static void Main (string[] args)
+                {
+                    try
+                    {
+                        var api = new YouTubeApi();
+                        var videos = api.GetVideos("mosh");
+                    }
+                    catch(Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);   //in case of an error we get our custom error here
+                    }
+                }
+        */
     }
 }
